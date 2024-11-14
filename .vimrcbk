@@ -1,0 +1,238 @@
+syntax on
+if has('python3')
+    let g:python3_host_prog = expand('~/.pyenv/shims/python3')
+endif
+" set pythonthreedll=C:\Python310\python310.dll
+" set pythonthreehome=C:\Python310
+set ignorecase
+set laststatus=2"show status line always
+set statusline=%f________%l:%c____%m
+filetype plugin on
+" set shellslash
+set encoding=utf-8
+set incsearch
+filetype indent on
+let g:tex_flavor='latex'
+"let g:tex_flavor='pdflatex'
+"let @p = ':w\n\ll\lv'
+"start texworks filexxx.pdf
+let g:Tex_MultipleCompileFormats = 'pdf'
+let g:Tex_DefaultTargetFormat = 'pdf'
+let g:Tex_ViewRule_pdf='texworks'
+"pythontex circuitDocumentation.tex
+call setreg('p', ":w\<Return>\\ll\\lv", 'c')
+set tabstop=4
+if &diff
+    set nospell
+    set wrap
+    set textwidth=50
+    syntax off
+else
+    set spell
+    set shiftwidth=4
+    set expandtab
+endif
+set number
+set relativenumber
+let php_folding=0
+":map <Leader>o o<Esc>
+autocmd FilterWritePre * if &diff | setlocal wrap | endif
+au VimEnter * if &diff | execute 'windo set wrap' | endif
+set switchbuf=useopen,usetab
+set smartindent
+highlight clear
+set cursorline
+set wildmenu wildoptions+=pum
+" set wildignore-=**/vendor/**
+set wildmode=full:lastused
+
+"comment: vim_undo_history"
+set undofile 
+set undodir=/.vim/
+set undodir=C:\vim\
+set hlsearch
+
+set wildignore+=**/vendor/**
+set wildignore+=**/*.jpg,**/*.png,**/*.dll,**/*.exe,**/*.mp3,**/*.docx,**/*.xlsx
+set wildignore+=*/vendor/*
+set wildignore+=*/node_modules/*
+set wildignore+=*/env/*
+set wildignore+=*/pycache/*
+set wildignore+=datadump.json
+set wildignore+=*.jpg
+set wildignore+=*.png
+set wildignore+=*.sqlite3
+set wildignore+=*.dll
+set wildignore+=*.exe
+
+ let data_dir = has('nvim') ? stdpath('data') . '/site' : '~/.vim'
+ if empty(glob(data_dir . '/autoload/plug.vim'))
+   silent execute '!curl -fLo '.data_dir.'/autoload/plug.vim --create-dirs  https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+   autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+ endif
+
+call plug#begin()
+Plug 'jelera/vim-javascript-syntax'
+Plug 'https://github.com/markonm/traces.vim.git'
+Plug 'https://github.com/rakr/vim-one.git'
+Plug 'https://github.com/NLKNguyen/papercolor-theme.git'
+" Plug 'https://github.com/vimwiki/vimwiki.git'
+Plug 'rust-lang/rust.vim'
+Plug 'github/copilot.vim'
+Plug 'phpactor/phpactor', {'for': 'php', 'tag': '*', 'do': 'composer install --no-dev -o'}
+Plug 'vim-php/phpctags', {'do': 'composer install' }
+" Plug 'ludovicchabant/vim-gutentags'
+Plug 'scrooloose/syntastic'
+Plug 'vim-scripts/dbext.vim'
+Plug 'tpope/vim-fugitive'
+Plug 'ctrlpvim/ctrlp.vim'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
+Plug 'dense-analysis/ale'
+Plug 'prettier/vim-prettier', { 'do': 'npm install' }
+Plug 'MaxMEllon/vim-jsx-pretty'
+Plug 'goerz/jupytext.vim'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
+" Plug 'puremourning/vimspector'
+Plug 'vim-vdebug/vdebug'
+Plug 'vim-vdebug/vdebug'
+Plug 'godlygeek/tabular'
+Plug 'preservim/vim-markdown'
+call plug#end()
+
+:nnoremap <A-a> <C-a>
+:nnoremap <A-x> <C-x>
+
+set t_Co=257
+" colorscheme one
+" colorscheme desert
+colorscheme evening
+set background=light
+set background=dark
+
+let g:vimwiki_list = [{'path': '~/vimwiki/',
+                      \ 'syntax': 'markdown', 'ext': '.md'}]
+let g:vimwiki_global_ext = 1
+
+set statusline+=%#warningmsg#
+set statusline+=%{SyntasticStatuslineFlag()}
+set statusline+=%*
+
+let g:syntastic_always_populate_loc_list = 1
+let g:syntastic_auto_loc_list = 1
+let g:syntastic_check_on_open = 1
+let g:syntastic_check_on_wq = 0
+" let g:syntastic_python_python_exec = 'C:\Python310\python.exe'
+" let g:syntastic_javascript_checkers = ['eslint']
+" let g:syntastic_javascript_checkers = ['jshint']
+
+" MySQL
+let g:dbext_default_sqlite_program = 'sqlite3'
+let g:dbext_default_SQLITE_SQL_Top_pat = 'SELECT * FROM %t LIMIT %n'
+let g:dbext_default_SQLITE_SQL_Top_sub = 'SELECT * FROM %t WHERE rowid IN (SELECT rowid FROM %t ORDER BY rowid LIMIT %n)'
+" let g:dbext_default_SQLITE_cmd_header = ".mode column\n" .
+"                                       \ ".width 8 60\n"  .
+"                                       \ ".headers ON\n\n"
+
+let g:dbext_default_sqlite_dbname = '/home/user/dbname.sqlite'
+
+let g:dbext_default_profile_mysql_local = 'type=MYSQL:user=user:passwd=pasword:dbname=local'
+let g:dbext_default_profile_mysql_remote = 'type=MYSQL:host=127.0.0.1:port=3307:user=user:passwd=password:dbname=remote'
+
+let g:dbext_default_SQLITE_bin = 'sqlite3'
+let g:dbext_default_profile_db1 = 'type=SQLITE:dbname=C:/Users/user/Documents/db1.db'
+
+let g:dbext_default_profile = 'mysql_local'
+
+" set shell=powershell
+let g:ctrlp_cmd = 'CtrlPBuffer'
+" let g:vimspector_enable_mappings='HUMAN'
+" let g:vimspector_config = {
+"    \ '_default_adapter' : 'php',
+"    \ }
+" packadd! vimspector
+
+let g:ale_enabled = 1
+
+" Configure ALE
+"    \ 'php': ['phpstan', 'phpcs','intelephense','php', 'phpactor', 'phpmd', 'psalm', 'tlint'],
+let g:ale_linters = {
+    \ 'javascript': ['eslint'],
+    \ 'javascript.jsx': ['eslint'],
+    \ 'php': ['intelephense', 'php'],
+    \ 'css': ['stylelint','csslint'],
+    \ }
+let g:ale_fixers = {
+    \ 'javascript': ['prettier'],
+    \ 'javascript.jsx': ['prettier'],
+    \ 'php': ['php_cs_fixer'],
+    \ }
+let g:ale_fix_on_save = 0
+
+" Configure Prettier
+let g:prettier#autoformat = 0
+let g:prettier#config#use_local_config = 1
+" Change ALE linting error highlighting color to a less distracting color
+highlight link ALEErrorSign Comment
+highlight link ALEError VirtualTextError
+" highlight link ALEWarningSign Comment
+highlight link ALEWarning VirtualTextWarning
+" let g:ale_echo_msg_format = ''
+let g:ale_set_highlights = 0
+let g:ale_set_loclist = 1
+let g:ale_echo_msg_format = '[%linter%] %s'
+let g:ale_virtualtext_cursor = 'current'
+let g:ale_open_list = 1
+let g:ale_keep_list_window_open = 0
+" set t_Co=155
+" colorscheme darkblue
+" set background = light
+
+" Vimspector configuration
+" let g:vimspector_enable_mappings = 'HUMAN'
+" let g:vimspector_enable_mappings = 'TEXT'
+
+" Set the PHP debugging adapter (xdebug or phpdbg)
+" let g:vimspector_php_debugger = 'xdebug'
+
+" Specify the PHP executable path
+" let g:vimspector_php_executable = '/path/to/php'
+
+" PHP Xdebug configuration (if using xdebug)
+" let g:vimspector_xdebug_config = {
+"   \ 'xdebug': {
+"   \   'url': 'http://localhost', 
+"   \   'port': 9000,             
+"   \   'log': '/home/user/log/file'
+"   \ }
+"   \ }
+
+
+
+" Key mappings for debugging commands (optional)
+" nnoremap <F5> :VimspectorContinue<CR>
+" nnoremap <F10> :VimspectorStepOver<CR>
+" nnoremap <F11> :VimspectorStepInto<CR>
+" nnoremap <F12> :VimspectorStepOut<CR>
+" nnoremap <Leader>b :VimspectorToggleBreakpoint<CR>
+
+let g:vdebug_options = {}
+let g:vdebug_options['port'] = 9000  " Xdebug default port
+let g:vdebug_options["timeout"] = 10
+
+
+" let g:python3_host_prog = '/home/user/GitHub/scripts/env/bin/python3'
+" let g:pynvim_python_host_prog = '/home/user/GitHub/scripts/env/bin/python3'
+let g:pynvim_term = 'xterm-256color'
+let g:pynvim_term_args = ['--detach', '--', 'xterm-256color']
+highlight Normal ctermbg=Black
+highlight NonText ctermbg=Black
+highlight Visual ctermbg=Black
+highlight Visual guibg=Black
+highlight Normal ctermbg=Black guibg=Black
+highlight NonText ctermbg=Black guibg=Black
+highlight CursorLine ctermbg=DarkGray guibg=DarkGray
+colorscheme evening
+autocmd FileType python setlocal makeprg=ipython\ %
+set diffopt+=vertical
+let g:vim_markdown_folding_disabled = 1
