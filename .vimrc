@@ -27,7 +27,7 @@ try
     " Platform-specific settings
     if has('win32') || has('win64')
         " Windows specific settings
-        set shellslash
+        " set shellslash
         set undodir=C:\vim\
         let g:python3_host_prog = 'C:\Python310\python.exe'
         let data_dir = $LOCALAPPDATA . '/vim-data' " Windows data directory for Vim
@@ -48,7 +48,7 @@ try
 
 " Plugin management with Vim-Plug (Ensure Vim-Plug is installed)
 if has('win32') || has('win64')
-    let plug_path = $LOCALAPPDATA . '\vim-data\autoload\plug.vim'
+    let plug_path = expand('~\\vimfiles\\autoload\\plug.vim')
     let plug_cmd = 'Invoke-WebRequest -Uri "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim" -OutFile "' . plug_path . '"'
     if empty(glob(plug_path))
         silent execute '!powershell -Command ' . plug_cmd
@@ -82,7 +82,7 @@ endif
     Plug 'prettier/vim-prettier', { 'do': 'npm install' }
     Plug 'MaxMEllon/vim-jsx-pretty'
     Plug 'goerz/jupytext.vim'
-    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    "Plug 'neoclide/coc.nvim', {'branch': 'release'}
     Plug 'vim-vdebug/vdebug'
     Plug 'godlygeek/tabular'
     Plug 'preservim/vim-markdown'
