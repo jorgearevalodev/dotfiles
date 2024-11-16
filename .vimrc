@@ -48,12 +48,23 @@ try
 
 " Plugin management with Vim-Plug (Ensure Vim-Plug is installed)
 if has('win32') || has('win64')
-    let plug_path = expand('~\\vimfiles\\autoload\\plug.vim')
-    let plug_cmd = 'Invoke-WebRequest -Uri "https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim" -OutFile "' . plug_path . '"'
-    if empty(glob(plug_path))
-        silent execute '!powershell -Command ' . plug_cmd
-        autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
-    endif
+	let plug_dir = expand('~\\vimfiles\\autoload')
+	let plug_path = plug_dir . '\\plug.vim'
+
+	" Create the directory if it doesn't exist
+	if empty(glob(plug_dir))
+		silent execute '!mkdir ' . shellescape(plug_dir)
+	endif
+
+	" Command to download vim-plug
+	let plug_cmd = 'curl.exe -L https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim -o ' . shellescape(plug_path)
+
+	" Download plug.vim if it doesn't exist
+	if empty(glob(plug_path))
+		silent execute '!' . plug_cmd
+		" Install plugins automatically after downloading plug.vim
+		autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+	endif
 else
     let plug_path = expand('~/.vim/autoload/plug.vim')
     if empty(glob(plug_path))

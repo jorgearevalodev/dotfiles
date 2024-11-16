@@ -3,7 +3,7 @@ $logFile = "./install_log.txt"
 function Log {
     param([string]$message)
     $timestamp = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
-    $formattedMessage = "$timestamp: $message"
+    $formattedMessage = "${timestamp}: ${message}"
     Write-Output $formattedMessage
     Add-Content -Path $logFile -Value $formattedMessage
 }
@@ -110,19 +110,19 @@ if (!(Test-Path -Path $adminAuthorizedKeysFile)) {
     }
 }
 
-# Read your SSH public key from ./your_public_key.pub
+# Read your SSH public key from ./id_rsa.pub
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$publicKeyPath = Join-Path $scriptDir "your_public_key.pub"
+$publicKeyPath = Join-Path $scriptDir "id_rsa.pub"
 
 if (!(Test-Path -Path $publicKeyPath)) {
-    Log "SSH public key file './your_public_key.pub' not found. Please make sure the file exists in the current directory. Exiting script."
+    Log "SSH public key file './id_rsa.pub' not found. Please make sure the file exists in the current directory. Exiting script."
     exit 1
 }
 
 # Read the content of the public key file
 try {
     $yourPublicKey = Get-Content -Path $publicKeyPath -ErrorAction Stop
-    Log "Successfully read public key from './your_public_key.pub'."
+    Log "Successfully read public key from './id_rsa.pub'."
 } catch {
     Log "Failed to read the SSH public key file. Exiting script."
     exit 9
