@@ -160,6 +160,9 @@ endif
     let g:vdebug_options['port'] = 9000  " Xdebug default port
     let g:vdebug_options["timeout"] = 10
 
+    set exrc          " Enable loading of local .vimrc files
+    set secure        " Restrict unsafe commands in local .vimrc files
+
     " Finalize redirection if no errors occurred
     redir END
 
