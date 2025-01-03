@@ -147,6 +147,7 @@ endif
         \ 'javascript.jsx': ['eslint'],
         \ 'php': ['intelephense', 'php'],
         \ 'css': ['stylelint', 'csslint'],
+        \ 'cpp': ['clangd', 'cppcheck'],
         \ }
     let g:ale_fixers = {
         \ 'javascript': ['prettier'],
@@ -154,12 +155,16 @@ endif
         \ 'php': ['php_cs_fixer'],
         \ }
     let g:ale_fix_on_save = 0
+    let g:ale_cpp_cc_options = '-std=c++17 -Wall -Wextra -pedantic'
+    let g:ale_cpp_clangd_options = '-std=c++17'
+    let g:prettier#config#tab_width = 2
 
     " PHP debugging (Vdebug configuration)
     let g:vdebug_options = {}
     let g:vdebug_options['port'] = 9000  " Xdebug default port
     let g:vdebug_options["timeout"] = 10
 
+    colorscheme desert
     set exrc          " Enable loading of local .vimrc files
     set secure        " Restrict unsafe commands in local .vimrc files
 
