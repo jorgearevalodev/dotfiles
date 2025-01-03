@@ -115,8 +115,12 @@ $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $publicKeyPath = Join-Path $scriptDir "id_rsa.pub"
 
 if (!(Test-Path -Path $publicKeyPath)) {
-    Log "SSH public key file './id_rsa.pub' not found. Please make sure the file exists in the current directory. Exiting script."
-    exit 1
+    Log "Downloading SSH public key from GitHub..."
+    curl -L https://github.com/jorgearevalodev/dotfiles/blob/main/id_rsa.pub?raw=true -o id_rsa.pub
+    if (!(Test-Path -Path $publicKeyPath)) {
+        Log "SSH public key file './id_rsa.pub' not found. Please make sure the file exists in the current directory. Exiting script."
+        exit 1
+    }
 }
 
 # Read the content of the public key file
