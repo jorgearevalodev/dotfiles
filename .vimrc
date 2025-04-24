@@ -43,7 +43,7 @@ try
     if filereadable(dbext_connections_file)
         execute 'source ' . dbext_connections_file
     else
-        echo "No dbext connection file found at " . dbext_connections_file
+        "echo "No dbext connection file found at " . dbext_connections_file
     endif
 
 " Plugin management with Vim-Plug (Ensure Vim-Plug is installed)
@@ -78,7 +78,7 @@ endif
     Plug 'https://github.com/markonm/traces.vim.git'
     Plug 'https://github.com/rakr/vim-one.git'
     Plug 'https://github.com/NLKNguyen/papercolor-theme.git'
-    Plug 'https://github.com/vimwiki/vimwiki.git'
+    "Plug 'https://github.com/vimwiki/vimwiki.git'
     Plug 'rust-lang/rust.vim'
     Plug 'github/copilot.vim'
     Plug 'phpactor/phpactor', {'for': 'php', 'tag': '*', 'do': 'composer install --no-dev -o'}
@@ -93,10 +93,12 @@ endif
     Plug 'prettier/vim-prettier', { 'do': 'npm install' }
     Plug 'MaxMEllon/vim-jsx-pretty'
     Plug 'goerz/jupytext.vim'
-    "Plug 'neoclide/coc.nvim', {'branch': 'release'}
-    Plug 'vim-vdebug/vdebug'
+    Plug 'neoclide/coc.nvim', {'branch': 'release'}
+    "Plug 'vim-vdebug/vdebug'
     Plug 'godlygeek/tabular'
-    Plug 'preservim/vim-markdown'
+    Plug 'madox2/vim-ai'
+    " Plug 'preservim/vim-markdown'
+    " Plug 'Exafunction/codeium.vim', { 'branch': 'main' }
     call plug#end()
 
     " LaTeX settings
@@ -113,7 +115,7 @@ endif
         set textwidth=50
         syntax off
     else
-        set spell
+        set nospell
     endif
 
     autocmd FilterWritePre * if &diff | setlocal wrap | endif
@@ -194,8 +196,19 @@ endif
     " - Once filled in, rename the file to `vim_dbext_connections.vim` and secure it.
     "---------------------------------------------------------------------------------------------------------------------------
 
+
+    " let g:netrw_list_cmd = 'dir /B'
+
+    " let g:netrw_list_cmd = 'cmd /C dir /B'
+    " let g:netrw_list_cmd = 'dir /B'
+
+    let g:netrw_sftp = 1
+    let g:netrw_liststyle = 3
+    let g:netrw_use_nosort = 1
+    let g:netrw_debug = 1
 catch
     " In case of an error, finalize redirection and inform the user
     redir END
     echo "An error occurred during Vim startup. Check the log at $HOME/vim_startup_log.txt"
 endtry
+set grepprg=rg\ --vimgrep\ --no-config

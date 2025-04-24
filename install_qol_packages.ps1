@@ -33,7 +33,7 @@ if (Get-Command choco -ErrorAction SilentlyContinue) {
 # Install Windows Terminal and Vim using Chocolatey
 Log "Installing Windows Terminal, Vim and Git using Chocolatey..."
 try {
-    choco install microsoft-windows-terminal vim git -y
+    choco install microsoft-windows-terminal vim --params "/NoGui" git gh notepadplusplus jq fzf ripgrep 7zip bat openssl.light python -y
     Log "Windows Terminal, Vim and Git installation completed."
 } catch {
     Log "Failed to install Windows Terminal or Vim or Git. Exiting script."
@@ -42,7 +42,7 @@ try {
 
 # Download `.vimrc` from GitHub only if it doesn't already exist
 $vimrcUrl = "https://raw.githubusercontent.com/jorgearevalodev/dotfiles/main/.vimrc"
-$vimrcDestination = "$HOME\.vimrc"
+$vimrcDestination = Join-Path $env:USERPROFILE ".vimrc"
 
 if (-not (Test-Path -Path $vimrcDestination)) {
     Log "Downloading .vimrc from GitHub..."
@@ -82,6 +82,22 @@ if (Get-Service -Name sshd -ErrorAction SilentlyContinue) {
     exit 6
 }
 
+Log "Ensuring firewall rule for SSH exists..."
+try {
+    if (-not (Get-NetFirewallRule -Name "OpenSSH-Server-In-TCP" -ErrorAction SilentlyContinue)) {
+        New-NetFirewallRule -Name "OpenSSH-Server-In-TCP" -DisplayName "OpenSSH Server (Inbound)" `
+            -Enabled True -Direction Inbound -Protocol TCP -Action Allow -LocalPort 22
+        Log "Firewall rule for SSH added."
+    } else {
+        Log "Firewall rule for SSH already exists. Skipping."
+    }
+} catch {
+    Log "Failed to add SSH firewall rule. Exiting script."
+    exit 12
+}
+
+
+
 # Define the path for the administrators_authorized_keys file using the PROGRAMDATA environment variable
 $adminAuthorizedKeysFile = Join-Path $env:PROGRAMDATA "ssh\administrators_authorized_keys"
 $sshDir = Join-Path $env:PROGRAMDATA "ssh"
@@ -110,15 +126,15 @@ if (!(Test-Path -Path $adminAuthorizedKeysFile)) {
     }
 }
 
-# Read your SSH public key from ./id_rsa.pub
+# Read your SSH public key
 $scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $publicKeyPath = Join-Path $scriptDir "id_rsa.pub"
 
 if (!(Test-Path -Path $publicKeyPath)) {
     Log "Downloading SSH public key from GitHub..."
-    curl -L https://github.com/jorgearevalodev/dotfiles/blob/main/id_rsa.pub?raw=true -o id_rsa.pub
+    Invoke-WebRequest -Uri "https://raw.githubusercontent.com/jorgearevalodev/dotfiles/main/id_rsa.pub" -OutFile $publicKeyPath -ErrorAction Stop
     if (!(Test-Path -Path $publicKeyPath)) {
-        Log "SSH public key file './id_rsa.pub' not found. Please make sure the file exists in the current directory. Exiting script."
+        Log "SSH public key file not found. Please make sure the file exists in the current directory. Exiting script."
         exit 1
     }
 }
@@ -126,7 +142,7 @@ if (!(Test-Path -Path $publicKeyPath)) {
 # Read the content of the public key file
 try {
     $yourPublicKey = Get-Content -Path $publicKeyPath -ErrorAction Stop
-    Log "Successfully read public key from './id_rsa.pub'."
+    Log "Successfully read public key "
 } catch {
     Log "Failed to read the SSH public key file. Exiting script."
     exit 9
@@ -134,10 +150,30 @@ try {
 
 # Add the public key to administrators_authorized_keys
 try {
-    Add-Content -Path $adminAuthorizedKeysFile -Value $yourPublicKey
-    Log "SSH public key added to administrators_authorized_keys."
+    try {
+        $currentKeys = Get-Content -Path $adminAuthorizedKeysFile -Raw -ErrorAction Stop
+            if ($null -eq $currentKeys) {
+                $currentKeys = ""
+                    Log "Note: administrators_authorized_keys was empty."
+            }
+    } catch {
+        Log "Warning: Couldn't read administrators_authorized_keys. Defaulting to empty. Error: $_"
+            $currentKeys = ""
+    }
+
+    if (-not [string]::IsNullOrWhiteSpace($yourPublicKey) -and -not $currentKeys.Contains($yourPublicKey)) {
+        try {
+            Add-Content -Path $adminAuthorizedKeysFile -Value "$yourPublicKey"
+                Log "SSH public key added to administrators_authorized_keys."
+        } catch {
+            Log "Failed to add the SSH public key to administrators_authorized_keys. Error: $_"
+                exit 10
+        }
+    } else {
+        Log "SSH public key already present or input was empty. Skipping append."
+    }
 } catch {
-    Log "Failed to add the SSH public key to administrators_authorized_keys. Exiting script."
+    Log "Failed to add the SSH public key to administrators_authorized_keys. Exiting script. Error: $_"
     exit 10
 }
 
@@ -152,4 +188,39 @@ try {
     exit 11
 }
 
+$sshdConfigPath = Join-Path $env:ProgramData "ssh\sshd_config"
+$adminMatchBlock = @"
+Match Group administrators
+       AuthorizedKeysFile __PROGRAMDATA__/ssh/administrators_authorized_keys
+"@
+
+if (-not (Select-String -Path $sshdConfigPath -Pattern "Match Group administrators" -Quiet)) {
+    Log "Adding Match Group administrators block to sshd_config..."
+    Add-Content -Path $sshdConfigPath -Value "`r`n$adminMatchBlock`r`n"
+    Restart-Service sshd
+    Log "sshd_config updated and sshd restarted."
+}
+
 Log "SSH public key has been added to administrators_authorized_keys for the Administrator account. Installation complete."
+
+# Upgrade pip properly
+try {
+    Log "Upgrading pip..."
+    python -m pip install --upgrade pip
+    Log "Pip upgrade completed."
+} catch {
+    Log "Failed to upgrade pip. Error: $_"
+    exit 14
+}
+
+# Install ipython
+try {
+    Log "Installing ipython..."
+    python -m pip install ipython
+    Log "ipython installation completed."
+} catch {
+    Log "Failed to install ipython. Error: $_"
+    exit 15
+}
+
+
